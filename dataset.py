@@ -1,86 +1,77 @@
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras import Sequential
+import os
+import random
 
+from PIL import Image
+import numpy as np
 from config import *
 
 
-def build_model() -> Sequential:
-    dropout_rate = 0.25
-    model = Sequential(
-        [
-            # Conv Layer 1
-            layers.Conv2D(32,
-                          (3, 3),
-                          input_shape=(image_height, image_width, 1),
-                          padding='same',
-                          activation='relu',
-                          kernel_initializer='glorot_uniform',
-                          bias_initializer='random_normal'),
-            layers.MaxPooling2D((2, 2), padding='same'),
-            layers.Dropout(dropout_rate),
+def label2vec(label):
+    vector = np.zeros(len(label) * len(char_set))
 
-            # Conv Layer 2
-            layers.Conv2D(64,
-                          (3, 3),
-                          padding='same',
-                          activation='relu',
-                          kernel_initializer='glorot_uniform',
-                          bias_initializer='random_normal'),
-            layers.MaxPooling2D((2, 2), padding='same'),
-            layers.Dropout(dropout_rate),
+    for i, ch in enumerate(label):
+        idx = i * len(char_set) + char_set.index(ch)
+        vector[idx] = 1
+    return vector
 
-            # Conv Layer 3
-            layers.Conv2D(128,
-                          (3, 3),
-                          padding='same',
-                          activation='relu',
-                          kernel_initializer='glorot_uniform',
-                          bias_initializer='random_normal'),
-            layers.MaxPooling2D((2, 2), padding='same'),
-            layers.Dropout(dropout_rate),
 
-            # Conv Layer 4
-            layers.Conv2D(64,
-                          (3, 3),
-                          padding='same',
-                          activation='relu',
-                          kernel_initializer='glorot_uniform',
-                          bias_initializer='random_normal'),
-            layers.MaxPooling2D((2, 2), padding='same'),
-            layers.Dropout(dropout_rate),
+def preprocess_label(label):
+    """
+        Replace C->c, K->k, P->p, S->s, W->w, V->v, U->u, X->x, Y->y, Z->z
+    """
+    return label.replace('C', 'c').replace('K', 'k').replace('P', 'p').replace('S', 's').replace('W', 'w') \
+        .replace('V', 'v').replace('U', 'u').replace('X', 'x').replace('Y', 'y').replace('Z', 'z')
 
-            # Conv Layer 5
-            layers.Conv2D(32,
-                          (3, 3),
-                          padding='same',
-                          activation='relu',
-                          kernel_initializer='glorot_uniform',
-                          bias_initializer='random_normal'),
-            layers.MaxPooling2D((2, 2), padding='same'),
-            layers.Dropout(dropout_rate),
 
-            # Dense 1
-            layers.Flatten(),
-            layers.Dense(1024,
-                         activation='relu',
-                         bias_initializer='random_normal'),
-            layers.Dropout(dropout_rate),
+def preprocess_image(img: Image):
+    # resize image
+    img = img.resize((image_width, image_height))
 
-            # Dense 2
-            layers.Dense(char_count * len(char_set),
-                         activation='sigmoid',
-                         bias_initializer='random_normal'),
-        ]
-    )
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
-                  loss=tf.keras.losses.BinaryCrossentropy(),
-                  metrics=['accuracy'])
+    # convert to array
+    img_array = np.array(img)
 
-    return model
+    # make it gray scale
+    if len(img_array.shape) > 2:
+        r, g, b = img_array[:, :, 0], img_array[:, :, 1], img_array[:, :, 2]
+        gray = (0.2989 * r + 0.5870 * g + 0.1140 * b) / 255
+        # gray_image = Image.fromarray(gray * 255)
+        # gray_image.show()
+        return gray
+    else:
+        return img_array / 255
+
+
+def samples(dir: str, batch_size=1000):
+    images = [f for f in os.listdir(dir) if f.endswith('.png')]
+    random.shuffle(images)
+
+    X = []
+    Y = []
+
+    while True:
+        for img in images:
+            label = img.split('_')[0]
+            captcha_image = Image.open(os.path.join(dir, img))
+
+            y = label2vec(preprocess_label(label))
+            x = preprocess_image(captcha_image)
+            x = np.expand_dims(x, 2)
+
+            X.append(x)
+            Y.append(y)
+
+            if len(X) == batch_size:
+                yield np.array(X), np.array(Y)
+                X = []
+                Y = []
+
+        if len(X) > 0:
+            yield np.array(X), np.array(Y)
+            X = []
+            Y = []
 
 
 if __name__ == '__main__':
-    m = build_model()
-    print(m.summary())
+    for x, y in samples('samples/train', 100):
+        print(len(x), len(y))
+    print('Done')

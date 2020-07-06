@@ -1,6 +1,6 @@
-from dataset import build_model
+from model import build_model
 from tensorflow.keras import Model
-from sample import samples
+from dataset import samples
 
 
 def train(model: Model):
