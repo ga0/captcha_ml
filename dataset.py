@@ -63,16 +63,20 @@ def build_model() -> Sequential:
 
             # Dense 1
             layers.Flatten(),
-            layers.Dense(1024, activation='relu'),
+            layers.Dense(1024,
+                         activation='relu',
+                         bias_initializer='random_normal'),
             layers.Dropout(dropout_rate),
 
             # Dense 2
-            layers.Dense(char_count * len(char_set)),
+            layers.Dense(char_count * len(char_set),
+                         activation='sigmoid',
+                         bias_initializer='random_normal'),
         ]
     )
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
-              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+                  loss=tf.keras.losses.BinaryCrossentropy(),
+                  metrics=['accuracy'])
 
     return model
 

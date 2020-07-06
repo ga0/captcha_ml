@@ -41,19 +41,37 @@ def preprocess_image(img: Image):
         return img_array / 255
 
 
-def samples(dir: str):
+def samples(dir: str, batch_size=1000):
     images = [f for f in os.listdir(dir) if f.endswith('.png')]
     random.shuffle(images)
-    images = images[:1000]
 
-    for img in images:
-        label = img.split('_')[0]
-        captcha_image = Image.open(os.path.join(dir, img))
+    X = []
+    Y = []
 
-        yield preprocess_image(captcha_image), label2vec(preprocess_label(label))
+    while True:
+        for img in images:
+            label = img.split('_')[0]
+            captcha_image = Image.open(os.path.join(dir, img))
+
+            y = label2vec(preprocess_label(label))
+            x = preprocess_image(captcha_image)
+            x = np.expand_dims(x, 2)
+
+            X.append(x)
+            Y.append(y)
+
+            if len(X) == batch_size:
+                yield np.array(X), np.array(Y)
+                X = []
+                Y = []
+
+        if len(X) > 0:
+            yield np.array(X), np.array(Y)
+            X = []
+            Y = []
 
 
 if __name__ == '__main__':
-    for x, y in samples('/Users/gaoxueyao/projects/captcha/samples'):
-        print(x, y)
+    for x, y in samples('samples/train', 100):
+        print(len(x), len(y))
     print('Done')
