@@ -41,9 +41,11 @@ def preprocess_image(img: Image):
         return img_array / 255
 
 
-def samples(dir: str, batch_size=1000):
+def samples(dir: str, batch_size=1000, max_samples=None):
     images = [f for f in os.listdir(dir) if f.endswith('.png')]
     random.shuffle(images)
+    if max_samples:
+        images = images[:max_samples]
 
     X = []
     Y = []
@@ -72,6 +74,6 @@ def samples(dir: str, batch_size=1000):
 
 
 if __name__ == '__main__':
-    for x, y in samples('samples/train', 100):
+    for x, y in samples('/Users/gaoxueyao/Desktop/train/', max_samples=1000):
         print(len(x), len(y))
     print('Done')

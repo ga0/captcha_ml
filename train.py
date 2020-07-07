@@ -1,26 +1,43 @@
 from model import build_model
+import tensorflow as tf
 from tensorflow.keras import Model
 from dataset import samples
+from config import *
 
 
 def train(model: Model):
-    model.fit_generator(
-        samples("samples/train", 1000),
-        steps_per_epoch=90,
-        epochs=10)
+    checkpoint_path = "checkpoint/cp-{epoch:04d}.ckpt"
+
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        verbose=1,
+        save_weights_only=True,
+        period=5)
+
+    validation_data = []
+    for v in samples('samples/test', batch_size=1000, max_samples=1000):
+        validation_data = v
+        break
+
+    batch_size = 32
+    model.fit(
+        samples("samples/train", batch_size=batch_size, max_samples=train_set_size),
+        validation_data=validation_data,
+        steps_per_epoch=train_set_size//batch_size,
+        epochs=100,
+        callbacks=[cp_callback])
     return model
 
 
 def evaluate(model: Model):
-    test_loss, test_acc = model.evaluate_generator(
-        samples("samples/test", 1000),
+    loss, acc1, acc2 = model.evaluate(
+        samples("samples/test", batch_size=1000, max_samples=1000),
         steps=1,
         verbose=1)
-    print('accuracy: {}, loss: {}'.format(test_acc, test_loss))
+    print('loss: {}, accuracy: {}, {}'.format(loss, acc1, acc2))
 
 
 if __name__ == '__main__':
     model = build_model()
     train(model)
-    evaluate(model)
     model.save('captcha_model')
