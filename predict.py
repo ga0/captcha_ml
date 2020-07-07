@@ -1,43 +1,43 @@
-import tensorflow as tf
-from tensorflow import keras
+import random
 from tensorflow.keras import Model
-from tensorflow.keras import layers
 import sys
 import os
 from dataset import preprocess_image, label2vec, preprocess_label
-from model import char_accuracy
 from PIL import Image
 import numpy as np
 from config import *
 from model import build_model
-from train import evaluate
 
 
 if __name__ == '__main__':
     image_dir = sys.argv[2]
+    image_files = os.listdir(image_dir)
+    random.shuffle(image_files)
+    image_files = image_files[:1000]
 
     model: Model = build_model()
     model.load_weights(sys.argv[1])
 
     correct, miss = 0, 0
-    for image_name in os.listdir(image_dir):
+    X = []
+
+    for image_name in image_files:
         fullpath = image_dir + '/' + image_name
         img = preprocess_image(Image.open(fullpath))
-        x = np.expand_dims(img, 0)
-        x = np.expand_dims(x, 3)
-        preds = model.predict(x)
+        X.append(np.expand_dims(img, 2))
 
-        preds[preds >= 0.5] = 1
-        preds[preds < 0.5] = 0
+    X = np.asarray(X)
+    preds = model.predict(X)
 
-        y = preds.reshape((-1, char_count, len(char_set)))
-        y0 = y[0]
+    Y = preds.reshape((-1, char_count, len(char_set)))
+    Y = np.argmax(Y, axis=2)
 
+    for i, y in enumerate(Y):
         label = ''
-        for a in y0:
-            am = np.argmax(a)
-            label += char_set[am]
+        for ch_index in y:
+            label += char_set[ch_index]
 
+        image_name = image_files[i]
         label_true = preprocess_label(image_name.split('_')[0])
 
         if label_true == label:
