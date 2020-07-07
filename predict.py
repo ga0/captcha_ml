@@ -11,7 +11,11 @@ from model import build_model
 
 if __name__ == '__main__':
     image_dir = sys.argv[2]
-    image_files = os.listdir(image_dir)
+    if os.path.isdir(image_dir):
+        image_files = os.listdir(image_dir)
+    else:
+        image_files = [image_dir.split('/')[-1]]
+        image_dir = '/'.join(image_dir.split('/')[:-1])
     random.shuffle(image_files)
     image_files = image_files[:1000]
 
@@ -29,16 +33,18 @@ if __name__ == '__main__':
     X = np.asarray(X)
     preds = model.predict(X)
 
-    Y = preds.reshape((-1, char_count, len(char_set)))
-    Y = np.argmax(Y, axis=2)
+    Y_pred = preds.reshape((-1, char_count, len(char_set)))
+    Y_pred = np.argmax(Y_pred, axis=2)
+    Y = []
 
-    for i, y in enumerate(Y):
+    for i, y in enumerate(Y_pred):
         label = ''
         for ch_index in y:
             label += char_set[ch_index]
 
         image_name = image_files[i]
         label_true = preprocess_label(image_name.split('_')[0])
+        Y.append(label2vec(label_true))
 
         if label_true == label:
             print('+ [%s] [%s] [%s]' % (image_name, label_true, label))
@@ -48,6 +54,13 @@ if __name__ == '__main__':
             miss += 1
 
     print('correct=%d, miss=%d' % (correct, miss))
+
+    loss, acc1, acc2 = model.evaluate(
+        X,
+        np.asarray(Y),
+        steps=1,
+        verbose=1)
+    print('loss: {}, accuracy: {}, {}'.format(loss, acc1, acc2))
 
 
 
