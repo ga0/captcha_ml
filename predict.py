@@ -9,17 +9,19 @@ from model import char_accuracy
 from PIL import Image
 import numpy as np
 from config import *
-
+from model import build_model
 from train import evaluate
 
-if __name__ == '__main__':
-    image_names = sys.argv[1:]
 
-    model: Model = keras.models.load_model("captcha_model", custom_objects={'captcha_metric': char_accuracy})
+if __name__ == '__main__':
+    image_dir = sys.argv[2]
+
+    model: Model = build_model()
+    model.load_weights(sys.argv[1])
 
     correct, miss = 0, 0
-    for image_name in image_names:
-        fullpath = '/Users/gaoxueyao/Desktop/train/' + image_name
+    for image_name in os.listdir(image_dir):
+        fullpath = image_dir + '/' + image_name
         img = preprocess_image(Image.open(fullpath))
         x = np.expand_dims(img, 0)
         x = np.expand_dims(x, 3)
