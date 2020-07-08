@@ -73,7 +73,7 @@ def build_model() -> Sequential:
     )
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
                   loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-                  metrics=[char_accuracy, 'accuracy'])
+                  metrics=[char_accuracy])
 
     return model
 

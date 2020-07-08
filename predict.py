@@ -55,12 +55,12 @@ if __name__ == '__main__':
 
     print('correct=%d, miss=%d' % (correct, miss))
 
-    loss, acc1, acc2 = model.evaluate(
+    loss, acc = model.evaluate(
         X,
         np.asarray(Y),
         steps=1,
         verbose=1)
-    print('loss: {}, accuracy: {}, {}'.format(loss, acc1, acc2))
+    print('loss: {}, accuracy: {}'.format(loss, acc))
 
 
 

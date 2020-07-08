@@ -25,16 +25,17 @@ def train(model: Model):
         validation_data=validation_data,
         steps_per_epoch=train_set_size//batch_size,
         epochs=100,
-        callbacks=[cp_callback])
+        callbacks=[cp_callback],
+        initial_epoch=0)
     return model
 
 
 def evaluate(model: Model):
-    loss, acc1, acc2 = model.evaluate(
+    loss, acc = model.evaluate(
         samples("samples/test", batch_size=1000, max_samples=1000),
         steps=1,
         verbose=1)
-    print('loss: {}, accuracy: {}, {}'.format(loss, acc1, acc2))
+    print('loss: {}, accuracy: {}'.format(loss, acc))
 
 
 if __name__ == '__main__':

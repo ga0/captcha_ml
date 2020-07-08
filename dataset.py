@@ -74,6 +74,6 @@ def samples(dir: str, batch_size=1000, max_samples=None):
 
 
 if __name__ == '__main__':
-    for x, y in samples('/Users/gaoxueyao/Desktop/train/', max_samples=1000):
+    for x, y in samples('samples/train', max_samples=1000):
         print(len(x), len(y))
     print('Done')
