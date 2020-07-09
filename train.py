@@ -17,7 +17,7 @@ def train(model: Model, init_epoch):
 
     batch_size = 32
     model.fit(
-        CaptchaDataset("samples/py_captcha", batch_size=batch_size, max_samples=1000),
+        CaptchaDataset("samples/train", batch_size=batch_size),
         validation_data=CaptchaDataset("samples/test", batch_size=batch_size),
         epochs=init_epoch+100,
         callbacks=[cp_callback],

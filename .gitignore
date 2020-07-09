@@ -4,3 +4,4 @@ __pycache__
 samples/
 captcha_model/
 checkpoint/
+captcha.jar
