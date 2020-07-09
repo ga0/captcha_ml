@@ -11,7 +11,8 @@ def generate_random_text():
 
 
 if __name__ == '__main__':
-    for i in range(9000):
+    N = 10000
+    for i in range(N):
         captchaGenerator = ImageCaptcha(
             width=random.randint(100, 200),
             height=random.randint(40, 80),
@@ -33,4 +34,7 @@ if __name__ == '__main__':
         )
         text = generate_random_text()
         captchaGenerator.write(text, 'samples/py_captcha/{}_{}_0.png'.format(text, i))
+
+        if i % 100 == 99:
+            print('%03f%%' % ((i + 1)/N * 100))
 

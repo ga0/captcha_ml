@@ -1,6 +1,7 @@
 import os
 import random
 
+from tensorflow import keras
 from PIL import Image
 import numpy as np
 from config import *
@@ -41,19 +42,26 @@ def preprocess_image(img: Image):
         return img_array / 255
 
 
-def samples(dir: str, batch_size=1000, max_samples=None):
-    images = [f for f in os.listdir(dir) if f.endswith('.png')]
-    random.shuffle(images)
-    if max_samples:
-        images = images[:max_samples]
+class CaptchaDataset(keras.utils.Sequence):
+    def __init__(self, dir, batch_size=32, max_samples=None):
+        images = [f for f in os.listdir(dir) if f.endswith('.png')]
+        random.shuffle(images)
+        if max_samples:
+            images = images[:max_samples]
+        self.images = images
+        self.batch_size = batch_size
+        self.directory = dir
 
-    X = []
-    Y = []
+    def __len__(self):
+        return len(self.images) // self.batch_size
 
-    while True:
+    def __getitem__(self, index):
+        images = self.images[index * self.batch_size : (index + 1) * self.batch_size]
+        X = []
+        Y = []
         for img in images:
             label = img.split('_')[0]
-            captcha_image = Image.open(os.path.join(dir, img))
+            captcha_image = Image.open(os.path.join(self.directory, img))
 
             y = label2vec(preprocess_label(label))
             x = preprocess_image(captcha_image)
@@ -62,18 +70,7 @@ def samples(dir: str, batch_size=1000, max_samples=None):
             X.append(x)
             Y.append(y)
 
-            if len(X) == batch_size:
-                yield np.array(X), np.array(Y)
-                X = []
-                Y = []
+        return np.array(X), np.array(Y)
 
-        if len(X) > 0:
-            yield np.array(X), np.array(Y)
-            X = []
-            Y = []
-
-
-if __name__ == '__main__':
-    for x, y in samples('samples/train', max_samples=1000):
-        print(len(x), len(y))
-    print('Done')
+    def on_epoch_end(self):
+        random.shuffle(self.images)

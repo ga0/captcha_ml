@@ -6,5 +6,3 @@ char_count = 4
 
 image_height = 40
 image_width = 100
-
-train_set_size = 1000
