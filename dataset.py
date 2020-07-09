@@ -49,7 +49,12 @@ class CaptchaDataset(keras.utils.Sequence):
         if max_samples:
             images = images[:max_samples]
         self.images = images
-        self.batch_size = batch_size
+        if batch_size > 0:
+            self.batch_size = batch_size
+        elif batch_size == -1:
+            self.batch_size = len(images)
+        else:
+            raise ValueError('invalid batch_size {}'.format(batch_size))
         self.directory = dir
 
     def __len__(self):
@@ -74,3 +79,7 @@ class CaptchaDataset(keras.utils.Sequence):
 
     def on_epoch_end(self):
         random.shuffle(self.images)
+
+
+if __name__ == '__main__':
+    d = CaptchaDataset('samples/test', batch_size=-1)
