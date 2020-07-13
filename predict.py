@@ -2,7 +2,7 @@ import random
 from tensorflow.keras import Model
 import sys
 import os
-from dataset import preprocess_image, label2vec, preprocess_label
+from dataset import preprocess_image
 from PIL import Image
 import numpy as np
 from config import *
@@ -43,24 +43,7 @@ if __name__ == '__main__':
             label += char_set[ch_index]
 
         image_name = image_files[i]
-        label_true = preprocess_label(image_name.split('_')[0])
-        Y.append(label2vec(label_true))
-
-        if label_true == label:
-            print('+ [%s] [%s] [%s]' % (image_name, label_true, label))
-            correct += 1
-        else:
-            print('- [%s] [%s] [%s]' % (image_name, label_true, label))
-            miss += 1
-
-    print('correct=%d, miss=%d' % (correct, miss))
-
-    loss, acc = model.evaluate(
-        X,
-        np.asarray(Y),
-        steps=1,
-        verbose=1)
-    print('loss: {}, accuracy: {}'.format(loss, acc))
+        print(image_name, label)
 
 
 

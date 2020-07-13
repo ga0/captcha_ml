@@ -45,13 +45,13 @@ def build_model() -> Sequential:
             layers.MaxPooling2D((2, 2), padding='same'),
             layers.Dropout(dropout_rate),
 
-            # # Conv Layer 4
-            # layers.Conv2D(64,
-            #               (3, 3),
-            #               padding='same',
-            #               activation='relu'),
-            # layers.MaxPooling2D((2, 2), padding='same'),
-            # layers.Dropout(dropout_rate),
+            # Conv Layer 4
+            layers.Conv2D(256,
+                          (3, 3),
+                          padding='same',
+                          activation='relu'),
+            layers.MaxPooling2D((2, 2), padding='same'),
+            layers.Dropout(dropout_rate),
             #
             # # Conv Layer 5
             # layers.Conv2D(32,

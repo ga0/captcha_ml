@@ -27,7 +27,7 @@ def train(model: Model, init_epoch):
 
 def evaluate(model: Model):
     loss, acc = model.evaluate(
-        CaptchaDataset('samples/test', batch_size=1000),
+        CaptchaDataset('samples/test', batch_size=-1),
         steps=1,
         verbose=1)
     print('loss: {}, accuracy: {}'.format(loss, acc))
