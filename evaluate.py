@@ -32,6 +32,7 @@ def in_charset(label):
             return False
     return True
 
+
 if __name__ == '__main__':
     image_dir = sys.argv[2]
     if os.path.isdir(image_dir):

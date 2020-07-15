@@ -6,6 +6,18 @@ from tensorflow.keras import Sequential
 
 from config import *
 
+import configparser
+cfg_parser = configparser.ConfigParser()
+cfg_parser.read('hyper_param.ini')
+
+dropout_rate = cfg_parser['default'].getfloat('dropout_rate', fallback=0.25)
+learning_rate = cfg_parser['default'].getfloat('learning_rate', fallback=0.0001)
+batch_size = cfg_parser['default'].getint('batch_size', fallback=32)
+
+
+def print_hyper_params():
+    print(f'Hyper-params: dropout_rate={dropout_rate}, learning_rate={learning_rate}, batch_size={batch_size}')
+
 
 def char_accuracy(y_true, y_pred):
     y_pred = K.reshape(y_pred, (-1, len(char_set)))
@@ -17,7 +29,6 @@ def char_accuracy(y_true, y_pred):
 
 
 def build_model() -> Sequential:
-    dropout_rate = 0.25
     model = Sequential(
         [
             # Conv Layer 1
@@ -71,7 +82,7 @@ def build_model() -> Sequential:
             layers.Dense(char_count * len(char_set))
         ]
     )
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                   loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
                   metrics=[char_accuracy])
 

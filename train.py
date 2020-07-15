@@ -1,8 +1,7 @@
-from model import build_model
+from model import build_model, print_hyper_params
 import tensorflow as tf
 from tensorflow.keras import Model
 from dataset import CaptchaDataset
-from config import *
 import sys
 
 
@@ -21,19 +20,14 @@ def train(model: Model, init_epoch):
         validation_data=CaptchaDataset("samples/test", batch_size=batch_size),
         epochs=init_epoch+100,
         callbacks=[cp_callback],
-        initial_epoch=init_epoch)
+        initial_epoch=init_epoch,
+        verbose=2)
     return model
 
 
-def evaluate(model: Model):
-    loss, acc = model.evaluate(
-        CaptchaDataset('samples/test', batch_size=-1),
-        steps=1,
-        verbose=1)
-    print('loss: {}, accuracy: {}'.format(loss, acc))
-
-
 if __name__ == '__main__':
+    print('Training start')
+    print_hyper_params()
     model = build_model()
     if len(sys.argv) > 1:
         init_epoch = int(sys.argv[1])
