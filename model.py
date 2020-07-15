@@ -6,18 +6,6 @@ from tensorflow.keras import Sequential
 
 from config import *
 
-import configparser
-cfg_parser = configparser.ConfigParser()
-cfg_parser.read('hyper_param.ini')
-
-dropout_rate = cfg_parser.getfloat('default', 'dropout_rate', fallback=0.25)
-learning_rate = cfg_parser.getfloat('default', 'learning_rate', fallback=0.0001)
-batch_size = cfg_parser.getint('default', 'batch_size', fallback=32)
-
-
-def print_hyper_params():
-    print(f'Hyper-params: dropout_rate={dropout_rate}, learning_rate={learning_rate}, batch_size={batch_size}')
-
 
 def char_accuracy(y_true, y_pred):
     y_pred = K.reshape(y_pred, (-1, len(char_set)))
@@ -53,6 +41,10 @@ def build_model() -> Sequential:
                           (3, 3),
                           padding='same',
                           activation='relu'),
+            layers.Conv2D(128,
+                          (3, 3),
+                          padding='same',
+                          activation='relu'),
             layers.MaxPooling2D((2, 2), padding='same'),
             layers.Dropout(dropout_rate),
 
@@ -61,11 +53,15 @@ def build_model() -> Sequential:
                           (3, 3),
                           padding='same',
                           activation='relu'),
+            layers.Conv2D(256,
+                          (3, 3),
+                          padding='same',
+                          activation='relu'),
             layers.MaxPooling2D((2, 2), padding='same'),
             layers.Dropout(dropout_rate),
-            #
+
             # # Conv Layer 5
-            # layers.Conv2D(32,
+            # layers.Conv2D(512,
             #               (3, 3),
             #               padding='same',
             #               activation='relu'),

@@ -1,8 +1,9 @@
-from model import build_model, print_hyper_params
+from model import build_model
 import tensorflow as tf
 from tensorflow.keras import Model
 from dataset import CaptchaDataset
 import sys
+from config import *
 
 
 def train(model: Model, init_epoch):
@@ -14,7 +15,6 @@ def train(model: Model, init_epoch):
         save_weights_only=True,
         save_freq='epoch')
 
-    batch_size = 32
     model.fit(
         CaptchaDataset("samples/train", batch_size=batch_size),
         validation_data=CaptchaDataset("samples/test", batch_size=batch_size),
