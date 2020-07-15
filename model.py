@@ -10,9 +10,9 @@ import configparser
 cfg_parser = configparser.ConfigParser()
 cfg_parser.read('hyper_param.ini')
 
-dropout_rate = cfg_parser['default'].getfloat('dropout_rate', fallback=0.25)
-learning_rate = cfg_parser['default'].getfloat('learning_rate', fallback=0.0001)
-batch_size = cfg_parser['default'].getint('batch_size', fallback=32)
+dropout_rate = cfg_parser.getfloat('default', 'dropout_rate', fallback=0.25)
+learning_rate = cfg_parser.getfloat('default', 'learning_rate', fallback=0.0001)
+batch_size = cfg_parser.getint('default', 'batch_size', fallback=32)
 
 
 def print_hyper_params():
