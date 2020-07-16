@@ -20,10 +20,11 @@ if gpus:
 
 
 def train(model: Model, init_epoch):
-    checkpoint_path = "checkpoint/cp-{epoch:04d}.ckpt"
+    checkpoint_path = checkpoint_dir + "/latest.ckpt"
 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path,
+        save_best_only=True,
         verbose=1,
         save_weights_only=True,
         save_freq='epoch')
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     model = build_model()
     if len(sys.argv) > 1:
         init_epoch = int(sys.argv[1])
-        model.load_weights(f'checkpoint/cp-{init_epoch :04d}.ckpt')
+        model.load_weights(checkpoint_dir + f'/latest.ckpt')
     else:
         init_epoch = 0
     train(model, init_epoch)

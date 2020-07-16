@@ -26,13 +26,6 @@ def draw_heatmap(Y_map):
     plt.savefig('heatmap.png')
 
 
-def in_charset(label):
-    for ch in label:
-        if char_set.find(ch) == -1:
-            return False
-    return True
-
-
 if __name__ == '__main__':
     image_dir = sys.argv[2]
     if os.path.isdir(image_dir):
@@ -40,7 +33,6 @@ if __name__ == '__main__':
     else:
         image_files = [image_dir.split('/')[-1]]
         image_dir = '/'.join(image_dir.split('/')[:-1])
-    image_files = [i for i in image_files if in_charset(i.split('_')[0])]
     random.shuffle(image_files)
     image_files = image_files[:10000]
 
